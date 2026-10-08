@@ -2,7 +2,7 @@ import sys, math, os
 sys.path.insert(0, os.path.dirname(__file__))
 import outline as o
 
-OUT = sys.argv[1]
+OUT = sys.argv[1] if __name__ == "__main__" else None
 INK, AMBER = '#0D0F13', '#F0B90B'
 f = lambda v: ('%.2f' % v).rstrip('0').rstrip('.')
 
@@ -10,8 +10,8 @@ def svg(w, h, body, title):
     return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {f(w)} {f(h)}" width="{f(w)}" height="{f(h)}" '
             f'role="img" aria-labelledby="title">\n  <title id="title">{title}</title>\n{body}</svg>\n')
 
-def save(name, s):
-    open(os.path.join(OUT, name), 'w').write(s)
+def save(name, s, out=None):
+    open(os.path.join(out or OUT or sys.argv[1], name), 'w').write(s)
 
 def poly(pts):
     return 'M' + ' L'.join(f'{f(x)} {f(y)}' for x, y in pts) + ' Z'
@@ -100,11 +100,12 @@ def lockup(symfn, color, title):
     W = x0 + boxes[-1][2] + 8
     return svg(W, 256, body, title)
 
-for color, suf in ((False, ''), (True, '-color')):
-    wa, la = concept_a(color)
-    save(f'a-wordmark{suf}.svg', wa); save(f'a-lockup{suf}.svg', la)
-    save(f'b-symbol{suf}.svg', svg(256, 256, symbol_b(color), 'РЕШЕНО symbol'))
-    save(f'b-lockup{suf}.svg', lockup(symbol_b, color, 'РЕШЕНО Business Live logo'))
-    save(f'c-symbol{suf}.svg', svg(256, 256, symbol_c(color), 'РЕШЕНО symbol'))
-    save(f'c-lockup{suf}.svg', lockup(symbol_c, color, 'РЕШЕНО Business Live logo'))
-print('ok')
+if __name__ == "__main__":
+  for color, suf in ((False, ''), (True, '-color')):
+      wa, la = concept_a(color)
+      save(f'a-wordmark{suf}.svg', wa); save(f'a-lockup{suf}.svg', la)
+      save(f'b-symbol{suf}.svg', svg(256, 256, symbol_b(color), 'РЕШЕНО symbol'))
+      save(f'b-lockup{suf}.svg', lockup(symbol_b, color, 'РЕШЕНО Business Live logo'))
+      save(f'c-symbol{suf}.svg', svg(256, 256, symbol_c(color), 'РЕШЕНО symbol'))
+      save(f'c-lockup{suf}.svg', lockup(symbol_c, color, 'РЕШЕНО Business Live logo'))
+  print('ok')
